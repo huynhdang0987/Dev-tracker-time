@@ -255,6 +255,30 @@ export interface TriggerCheckResponse {
   success: boolean;
   alertsCreated: number;
   message: string;
+  /** @nullable */
+  leaderEmail?: string | null;
+}
+
+export interface SystemSettings {
+  /** @nullable */
+  leaderEmail?: string | null;
+  /** @nullable */
+  leaderName?: string | null;
+  /** Default check-in time for new developers (HH:MM) */
+  checkinTime: string;
+  /** Default check-out time for new developers (HH:MM) */
+  checkoutTime: string;
+}
+
+export interface UpdateSettingsBody {
+  /** @nullable */
+  leaderEmail?: string | null;
+  /** @nullable */
+  leaderName?: string | null;
+  /** @nullable */
+  checkinTime?: string | null;
+  /** @nullable */
+  checkoutTime?: string | null;
 }
 
 export type ListCheckinsParams = {

@@ -1,12 +1,17 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, developersTable, checkinsTable, reportsTable, alertsTable } from "@workspace/db";
+import { db, developersTable, checkinsTable, reportsTable, alertsTable, settingsTable } from "@workspace/db";
 import {
   N8nWebhookBody,
   N8nWebhookResponse,
   TriggerDailyCheckResponse,
 } from "@workspace/api-zod";
 import { logger } from "../lib/logger";
+
+async function getSettingValue(key: string): Promise<string | null> {
+  const [row] = await db.select().from(settingsTable).where(eq(settingsTable.key, key));
+  return row?.value ?? null;
+}
 
 const router: IRouter = Router();
 
@@ -138,11 +143,14 @@ router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
     }
   }
 
+  const leaderEmail = await getSettingValue("leader_email");
+
   res.json(
     TriggerDailyCheckResponse.parse({
       success: true,
       alertsCreated: alertsCreated.length,
       message: `Daily check complete. ${alertsCreated.length} new alerts created.`,
+      leaderEmail: leaderEmail || null,
     })
   );
 });

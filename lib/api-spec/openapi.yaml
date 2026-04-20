@@ -24,6 +24,8 @@ tags:
     description: Dashboard statistics
   - name: n8n
     description: n8n webhook integration
+  - name: settings
+    description: System settings
 paths:
   /healthz:
     get:
@@ -394,6 +396,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResponseStat"
+
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get system settings
+      responses:
+        "200":
+          description: System settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update system settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemSettings"
 
   /n8n/webhook:
     post:
@@ -819,7 +851,38 @@ components:
           type: integer
         message:
           type: string
+        leaderEmail:
+          type: ["string", "null"]
       required:
         - success
         - alertsCreated
         - message
+
+    SystemSettings:
+      type: object
+      properties:
+        leaderEmail:
+          type: ["string", "null"]
+        leaderName:
+          type: ["string", "null"]
+        checkinTime:
+          type: string
+          description: Default check-in time for new developers (HH:MM)
+        checkoutTime:
+          type: string
+          description: Default check-out time for new developers (HH:MM)
+      required:
+        - checkinTime
+        - checkoutTime
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        leaderEmail:
+          type: ["string", "null"]
+        leaderName:
+          type: ["string", "null"]
+        checkinTime:
+          type: ["string", "null"]
+        checkoutTime:
+          type: ["string", "null"]

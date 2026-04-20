@@ -7,6 +7,7 @@ import reportsRouter from "./reports";
 import alertsRouter from "./alerts";
 import dashboardRouter from "./dashboard";
 import n8nRouter from "./n8n";
+import settingsRouter from "./settings";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(reportsRouter);
 router.use(alertsRouter);
 router.use(dashboardRouter);
 router.use(n8nRouter);
+router.use(settingsRouter);
 
 export default router;

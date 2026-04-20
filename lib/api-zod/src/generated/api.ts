@@ -327,6 +327,41 @@ export const GetResponseStatsResponseItem = zod.object({
 export const GetResponseStatsResponse = zod.array(GetResponseStatsResponseItem);
 
 /**
+ * @summary Get system settings
+ */
+export const GetSettingsResponse = zod.object({
+  leaderEmail: zod.string().nullish(),
+  leaderName: zod.string().nullish(),
+  checkinTime: zod
+    .string()
+    .describe("Default check-in time for new developers (HH:MM)"),
+  checkoutTime: zod
+    .string()
+    .describe("Default check-out time for new developers (HH:MM)"),
+});
+
+/**
+ * @summary Update system settings
+ */
+export const UpdateSettingsBody = zod.object({
+  leaderEmail: zod.string().nullish(),
+  leaderName: zod.string().nullish(),
+  checkinTime: zod.string().nullish(),
+  checkoutTime: zod.string().nullish(),
+});
+
+export const UpdateSettingsResponse = zod.object({
+  leaderEmail: zod.string().nullish(),
+  leaderName: zod.string().nullish(),
+  checkinTime: zod
+    .string()
+    .describe("Default check-in time for new developers (HH:MM)"),
+  checkoutTime: zod
+    .string()
+    .describe("Default check-out time for new developers (HH:MM)"),
+});
+
+/**
  * @summary Receive webhook from n8n automation
  */
 export const N8nWebhookBody = zod.object({
@@ -347,4 +382,5 @@ export const TriggerDailyCheckResponse = zod.object({
   success: zod.boolean(),
   alertsCreated: zod.number(),
   message: zod.string(),
+  leaderEmail: zod.string().nullish(),
 });

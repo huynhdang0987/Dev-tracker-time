@@ -3,3 +3,4 @@ export * from "./checkins";
 export * from "./responses";
 export * from "./reports";
 export * from "./alerts";
+export * from "./settings";
