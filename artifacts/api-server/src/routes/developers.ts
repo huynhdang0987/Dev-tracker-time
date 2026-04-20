@@ -30,8 +30,8 @@ router.post("/developers", async (req, res): Promise<void> => {
     .insert(developersTable)
     .values({
       ...parsed.data,
-      checkinTime: parsed.data.checkinTime ?? "09:00",
-      checkoutTime: parsed.data.checkoutTime ?? "18:00",
+      checkinTime: parsed.data.checkinTime ?? "08:00",
+      checkoutTime: parsed.data.checkoutTime ?? "17:00",
     })
     .returning();
 
