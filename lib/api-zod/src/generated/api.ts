@@ -14,3 +14,337 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary List all developers
+ */
+export const ListDevelopersResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  email: zod.string(),
+  slackId: zod.string().nullish(),
+  checkinTime: zod.string().describe("Expected check-in time (HH:MM)"),
+  checkoutTime: zod.string().describe("Expected check-out time (HH:MM)"),
+  active: zod.boolean(),
+  createdAt: zod.coerce.date(),
+});
+export const ListDevelopersResponse = zod.array(ListDevelopersResponseItem);
+
+/**
+ * @summary Create a developer
+ */
+export const CreateDeveloperBody = zod.object({
+  name: zod.string(),
+  email: zod.string(),
+  slackId: zod.string().nullish(),
+  checkinTime: zod
+    .string()
+    .optional()
+    .describe("Expected check-in time (HH:MM), default 09:00"),
+  checkoutTime: zod
+    .string()
+    .optional()
+    .describe("Expected check-out time (HH:MM), default 18:00"),
+});
+
+/**
+ * @summary Get developer by ID
+ */
+export const GetDeveloperParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetDeveloperResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  email: zod.string(),
+  slackId: zod.string().nullish(),
+  checkinTime: zod.string().describe("Expected check-in time (HH:MM)"),
+  checkoutTime: zod.string().describe("Expected check-out time (HH:MM)"),
+  active: zod.boolean(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Update a developer
+ */
+export const UpdateDeveloperParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateDeveloperBody = zod.object({
+  name: zod.string().nullish(),
+  email: zod.string().nullish(),
+  slackId: zod.string().nullish(),
+  checkinTime: zod.string().nullish(),
+  checkoutTime: zod.string().nullish(),
+  active: zod.boolean().nullish(),
+});
+
+export const UpdateDeveloperResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  email: zod.string(),
+  slackId: zod.string().nullish(),
+  checkinTime: zod.string().describe("Expected check-in time (HH:MM)"),
+  checkoutTime: zod.string().describe("Expected check-out time (HH:MM)"),
+  active: zod.boolean(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete a developer
+ */
+export const DeleteDeveloperParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List check-ins
+ */
+export const ListCheckinsQueryParams = zod.object({
+  developerId: zod.coerce.number().nullish(),
+  date: zod.coerce.string().nullish(),
+});
+
+export const ListCheckinsResponseItem = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  date: zod.coerce.date(),
+  checkinAt: zod.coerce.date().nullish(),
+  checkoutAt: zod.coerce.date().nullish(),
+  checkinStatus: zod.enum(["on_time", "late", "missing"]),
+  checkoutStatus: zod.enum(["on_time", "early", "missing"]),
+  notes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+export const ListCheckinsResponse = zod.array(ListCheckinsResponseItem);
+
+/**
+ * @summary Create check-in
+ */
+export const CreateCheckinBody = zod.object({
+  developerId: zod.number(),
+  checkinAt: zod.coerce.date(),
+  notes: zod.string().nullish(),
+});
+
+/**
+ * @summary Record checkout for a check-in
+ */
+export const CheckoutParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const CheckoutBody = zod.object({
+  checkoutAt: zod.coerce.date(),
+});
+
+export const CheckoutResponse = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  date: zod.coerce.date(),
+  checkinAt: zod.coerce.date().nullish(),
+  checkoutAt: zod.coerce.date().nullish(),
+  checkinStatus: zod.enum(["on_time", "late", "missing"]),
+  checkoutStatus: zod.enum(["on_time", "early", "missing"]),
+  notes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary List response time records
+ */
+export const ListResponsesQueryParams = zod.object({
+  developerId: zod.coerce.number().nullish(),
+  date: zod.coerce.string().nullish(),
+});
+
+export const ListResponsesResponseItem = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  messageAt: zod.coerce.date(),
+  respondedAt: zod.coerce.date().nullish(),
+  responseTimeMinutes: zod.number().nullish(),
+  topic: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+export const ListResponsesResponse = zod.array(ListResponsesResponseItem);
+
+/**
+ * @summary Record a response time event
+ */
+export const CreateResponseBody = zod.object({
+  developerId: zod.number(),
+  messageAt: zod.coerce.date(),
+  respondedAt: zod.coerce.date().nullish(),
+  topic: zod.string().nullish(),
+});
+
+/**
+ * @summary List daily reports
+ */
+export const ListReportsQueryParams = zod.object({
+  developerId: zod.coerce.number().nullish(),
+  date: zod.coerce.string().nullish(),
+});
+
+export const ListReportsResponseItem = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  date: zod.coerce.date(),
+  content: zod.string(),
+  submittedAt: zod.coerce.date(),
+  status: zod.enum(["submitted", "missing"]),
+  createdAt: zod.coerce.date(),
+});
+export const ListReportsResponse = zod.array(ListReportsResponseItem);
+
+/**
+ * @summary Submit a daily report
+ */
+export const CreateReportBody = zod.object({
+  developerId: zod.number(),
+  date: zod.coerce.date().optional(),
+  content: zod.string(),
+});
+
+/**
+ * @summary List alerts
+ */
+export const ListAlertsQueryParams = zod.object({
+  developerId: zod.coerce.number().nullish(),
+  resolved: zod.coerce.string().nullish(),
+});
+
+export const ListAlertsResponseItem = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  type: zod.enum([
+    "late_checkin",
+    "missing_checkin",
+    "late_checkout",
+    "missing_checkout",
+    "missing_report",
+    "slow_response",
+  ]),
+  message: zod.string(),
+  resolved: zod.boolean(),
+  emailSent: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  resolvedAt: zod.coerce.date().nullish(),
+});
+export const ListAlertsResponse = zod.array(ListAlertsResponseItem);
+
+/**
+ * @summary Create an alert
+ */
+export const CreateAlertBody = zod.object({
+  developerId: zod.number(),
+  type: zod.enum([
+    "late_checkin",
+    "missing_checkin",
+    "late_checkout",
+    "missing_checkout",
+    "missing_report",
+    "slow_response",
+  ]),
+  message: zod.string(),
+  emailSent: zod.boolean().optional(),
+});
+
+/**
+ * @summary Resolve an alert
+ */
+export const ResolveAlertParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ResolveAlertResponse = zod.object({
+  id: zod.number(),
+  developerId: zod.number(),
+  developerName: zod.string(),
+  type: zod.enum([
+    "late_checkin",
+    "missing_checkin",
+    "late_checkout",
+    "missing_checkout",
+    "missing_report",
+    "slow_response",
+  ]),
+  message: zod.string(),
+  resolved: zod.boolean(),
+  emailSent: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  resolvedAt: zod.coerce.date().nullish(),
+});
+
+/**
+ * @summary Get dashboard summary stats
+ */
+export const GetDashboardSummaryResponse = zod.object({
+  totalDevelopers: zod.number(),
+  checkedInToday: zod.number(),
+  missingCheckinToday: zod.number(),
+  reportsSubmittedToday: zod.number(),
+  unresolvedAlerts: zod.number(),
+  avgResponseTimeMinutes: zod.number().nullish(),
+});
+
+/**
+ * @summary Get today's status for all developers
+ */
+export const GetTodayStatusResponseItem = zod.object({
+  developerId: zod.number(),
+  developerName: zod.string(),
+  email: zod.string(),
+  expectedCheckin: zod.string(),
+  expectedCheckout: zod.string(),
+  checkinAt: zod.string().nullish(),
+  checkoutAt: zod.string().nullish(),
+  checkinStatus: zod.enum(["on_time", "late", "missing"]),
+  checkoutStatus: zod.enum(["on_time", "early", "missing"]),
+  reportSubmitted: zod.boolean(),
+  alertCount: zod.number(),
+});
+export const GetTodayStatusResponse = zod.array(GetTodayStatusResponseItem);
+
+/**
+ * @summary Get response time statistics per developer
+ */
+export const GetResponseStatsResponseItem = zod.object({
+  developerId: zod.number(),
+  developerName: zod.string(),
+  avgResponseMinutes: zod.number().nullish(),
+  totalMessages: zod.number(),
+  respondedMessages: zod.number(),
+});
+export const GetResponseStatsResponse = zod.array(GetResponseStatsResponseItem);
+
+/**
+ * @summary Receive webhook from n8n automation
+ */
+export const N8nWebhookBody = zod.object({
+  event: zod.string(),
+  developerId: zod.number().nullish(),
+  data: zod.object({}).passthrough().optional(),
+});
+
+export const N8nWebhookResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Trigger a daily compliance check (called by n8n cron)
+ */
+export const TriggerDailyCheckResponse = zod.object({
+  success: zod.boolean(),
+  alertsCreated: zod.number(),
+  message: zod.string(),
+});

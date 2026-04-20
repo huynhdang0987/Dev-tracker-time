@@ -10,6 +10,20 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: developers
+    description: Developer management
+  - name: checkins
+    description: Daily check-in/check-out management
+  - name: responses
+    description: Response time tracking
+  - name: reports
+    description: Daily reports
+  - name: alerts
+    description: Alert management
+  - name: dashboard
+    description: Dashboard statistics
+  - name: n8n
+    description: n8n webhook integration
 paths:
   /healthz:
     get:
@@ -24,6 +38,395 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /developers:
+    get:
+      operationId: listDevelopers
+      tags: [developers]
+      summary: List all developers
+      responses:
+        "200":
+          description: List of developers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Developer"
+    post:
+      operationId: createDeveloper
+      tags: [developers]
+      summary: Create a developer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeveloperBody"
+      responses:
+        "201":
+          description: Developer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Developer"
+        "400":
+          description: Bad request
+
+  /developers/{id}:
+    get:
+      operationId: getDeveloper
+      tags: [developers]
+      summary: Get developer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Developer found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Developer"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateDeveloper
+      tags: [developers]
+      summary: Update a developer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeveloperBody"
+      responses:
+        "200":
+          description: Developer updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Developer"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDeveloper
+      tags: [developers]
+      summary: Delete a developer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /checkins:
+    get:
+      operationId: listCheckins
+      tags: [checkins]
+      summary: List check-ins
+      parameters:
+        - name: developerId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: date
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of check-ins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Checkin"
+    post:
+      operationId: createCheckin
+      tags: [checkins]
+      summary: Create check-in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCheckinBody"
+      responses:
+        "201":
+          description: Check-in created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Checkin"
+        "400":
+          description: Bad request
+
+  /checkins/{id}/checkout:
+    patch:
+      operationId: checkout
+      tags: [checkins]
+      summary: Record checkout for a check-in
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutBody"
+      responses:
+        "200":
+          description: Checkout recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Checkin"
+        "404":
+          description: Not found
+
+  /responses:
+    get:
+      operationId: listResponses
+      tags: [responses]
+      summary: List response time records
+      parameters:
+        - name: developerId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: date
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of responses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Response"
+    post:
+      operationId: createResponse
+      tags: [responses]
+      summary: Record a response time event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResponseBody"
+      responses:
+        "201":
+          description: Response created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "400":
+          description: Bad request
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List daily reports
+      parameters:
+        - name: developerId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: date
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Submit a daily report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportBody"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "400":
+          description: Bad request
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [alerts]
+      summary: List alerts
+      parameters:
+        - name: developerId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: resolved
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+    post:
+      operationId: createAlert
+      tags: [alerts]
+      summary: Create an alert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAlertBody"
+      responses:
+        "201":
+          description: Alert created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/resolve:
+    patch:
+      operationId: resolveAlert
+      tags: [alerts]
+      summary: Resolve an alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Alert resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+        "404":
+          description: Not found
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/today:
+    get:
+      operationId: getTodayStatus
+      tags: [dashboard]
+      summary: Get today's status for all developers
+      responses:
+        "200":
+          description: Today's developer status list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeveloperTodayStatus"
+
+  /dashboard/response-stats:
+    get:
+      operationId: getResponseStats
+      tags: [dashboard]
+      summary: Get response time statistics per developer
+      responses:
+        "200":
+          description: Response time stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResponseStat"
+
+  /n8n/webhook:
+    post:
+      operationId: n8nWebhook
+      tags: [n8n]
+      summary: Receive webhook from n8n automation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/N8nWebhookBody"
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/N8nWebhookResponse"
+
+  /n8n/trigger-check:
+    post:
+      operationId: triggerDailyCheck
+      tags: [n8n]
+      summary: Trigger a daily compliance check (called by n8n cron)
+      responses:
+        "200":
+          description: Check triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerCheckResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +437,389 @@ components:
       required:
         - status
 
+    Developer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        slackId:
+          type: ["string", "null"]
+        checkinTime:
+          type: string
+          description: Expected check-in time (HH:MM)
+        checkoutTime:
+          type: string
+          description: Expected check-out time (HH:MM)
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - checkinTime
+        - checkoutTime
+        - active
+        - createdAt
+
+    CreateDeveloperBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        slackId:
+          type: ["string", "null"]
+        checkinTime:
+          type: string
+          description: Expected check-in time (HH:MM), default 09:00
+        checkoutTime:
+          type: string
+          description: Expected check-out time (HH:MM), default 18:00
+      required:
+        - name
+        - email
+
+    UpdateDeveloperBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        slackId:
+          type: ["string", "null"]
+        checkinTime:
+          type: ["string", "null"]
+        checkoutTime:
+          type: ["string", "null"]
+        active:
+          type: ["boolean", "null"]
+
+    Checkin:
+      type: object
+      properties:
+        id:
+          type: integer
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        date:
+          type: string
+          format: date
+        checkinAt:
+          type: ["string", "null"]
+          format: date-time
+        checkoutAt:
+          type: ["string", "null"]
+          format: date-time
+        checkinStatus:
+          type: string
+          enum: [on_time, late, missing]
+        checkoutStatus:
+          type: string
+          enum: [on_time, early, missing]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - developerId
+        - developerName
+        - date
+        - checkinStatus
+        - checkoutStatus
+        - createdAt
+
+    CreateCheckinBody:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        checkinAt:
+          type: string
+          format: date-time
+        notes:
+          type: ["string", "null"]
+      required:
+        - developerId
+        - checkinAt
+
+    CheckoutBody:
+      type: object
+      properties:
+        checkoutAt:
+          type: string
+          format: date-time
+      required:
+        - checkoutAt
+
+    Response:
+      type: object
+      properties:
+        id:
+          type: integer
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        messageAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: ["string", "null"]
+          format: date-time
+        responseTimeMinutes:
+          type: ["integer", "null"]
+        topic:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - developerId
+        - developerName
+        - messageAt
+        - createdAt
+
+    CreateResponseBody:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        messageAt:
+          type: string
+          format: date-time
+        respondedAt:
+          type: ["string", "null"]
+          format: date-time
+        topic:
+          type: ["string", "null"]
+      required:
+        - developerId
+        - messageAt
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        date:
+          type: string
+          format: date
+        content:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [submitted, missing]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - developerId
+        - developerName
+        - date
+        - content
+        - submittedAt
+        - status
+        - createdAt
+
+    CreateReportBody:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        date:
+          type: string
+          format: date
+        content:
+          type: string
+      required:
+        - developerId
+        - content
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        type:
+          type: string
+          enum: [late_checkin, missing_checkin, late_checkout, missing_checkout, missing_report, slow_response]
+        message:
+          type: string
+        resolved:
+          type: boolean
+        emailSent:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: ["string", "null"]
+          format: date-time
+      required:
+        - id
+        - developerId
+        - developerName
+        - type
+        - message
+        - resolved
+        - emailSent
+        - createdAt
+
+    CreateAlertBody:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        type:
+          type: string
+          enum: [late_checkin, missing_checkin, late_checkout, missing_checkout, missing_report, slow_response]
+        message:
+          type: string
+        emailSent:
+          type: boolean
+      required:
+        - developerId
+        - type
+        - message
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalDevelopers:
+          type: integer
+        checkedInToday:
+          type: integer
+        missingCheckinToday:
+          type: integer
+        reportsSubmittedToday:
+          type: integer
+        unresolvedAlerts:
+          type: integer
+        avgResponseTimeMinutes:
+          type: ["number", "null"]
+      required:
+        - totalDevelopers
+        - checkedInToday
+        - missingCheckinToday
+        - reportsSubmittedToday
+        - unresolvedAlerts
+
+    DeveloperTodayStatus:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        email:
+          type: string
+        expectedCheckin:
+          type: string
+        expectedCheckout:
+          type: string
+        checkinAt:
+          type: ["string", "null"]
+        checkoutAt:
+          type: ["string", "null"]
+        checkinStatus:
+          type: string
+          enum: [on_time, late, missing]
+        checkoutStatus:
+          type: string
+          enum: [on_time, early, missing]
+        reportSubmitted:
+          type: boolean
+        alertCount:
+          type: integer
+      required:
+        - developerId
+        - developerName
+        - email
+        - expectedCheckin
+        - expectedCheckout
+        - checkinStatus
+        - checkoutStatus
+        - reportSubmitted
+        - alertCount
+
+    ResponseStat:
+      type: object
+      properties:
+        developerId:
+          type: integer
+        developerName:
+          type: string
+        avgResponseMinutes:
+          type: ["number", "null"]
+        totalMessages:
+          type: integer
+        respondedMessages:
+          type: integer
+      required:
+        - developerId
+        - developerName
+        - totalMessages
+        - respondedMessages
+
+    N8nWebhookBody:
+      type: object
+      properties:
+        event:
+          type: string
+        developerId:
+          type: ["integer", "null"]
+        data:
+          type: object
+      required:
+        - event
+
+    N8nWebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+
+    TriggerCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        alertsCreated:
+          type: integer
+        message:
+          type: string
+      required:
+        - success
+        - alertsCreated
+        - message

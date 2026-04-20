@@ -8,3 +8,295 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface Developer {
+  id: number;
+  name: string;
+  email: string;
+  /** @nullable */
+  slackId?: string | null;
+  /** Expected check-in time (HH:MM) */
+  checkinTime: string;
+  /** Expected check-out time (HH:MM) */
+  checkoutTime: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface CreateDeveloperBody {
+  name: string;
+  email: string;
+  /** @nullable */
+  slackId?: string | null;
+  /** Expected check-in time (HH:MM), default 09:00 */
+  checkinTime?: string;
+  /** Expected check-out time (HH:MM), default 18:00 */
+  checkoutTime?: string;
+}
+
+export interface UpdateDeveloperBody {
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  slackId?: string | null;
+  /** @nullable */
+  checkinTime?: string | null;
+  /** @nullable */
+  checkoutTime?: string | null;
+  /** @nullable */
+  active?: boolean | null;
+}
+
+export type CheckinCheckinStatus =
+  (typeof CheckinCheckinStatus)[keyof typeof CheckinCheckinStatus];
+
+export const CheckinCheckinStatus = {
+  on_time: "on_time",
+  late: "late",
+  missing: "missing",
+} as const;
+
+export type CheckinCheckoutStatus =
+  (typeof CheckinCheckoutStatus)[keyof typeof CheckinCheckoutStatus];
+
+export const CheckinCheckoutStatus = {
+  on_time: "on_time",
+  early: "early",
+  missing: "missing",
+} as const;
+
+export interface Checkin {
+  id: number;
+  developerId: number;
+  developerName: string;
+  date: string;
+  /** @nullable */
+  checkinAt?: string | null;
+  /** @nullable */
+  checkoutAt?: string | null;
+  checkinStatus: CheckinCheckinStatus;
+  checkoutStatus: CheckinCheckoutStatus;
+  /** @nullable */
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface CreateCheckinBody {
+  developerId: number;
+  checkinAt: string;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface CheckoutBody {
+  checkoutAt: string;
+}
+
+export interface Response {
+  id: number;
+  developerId: number;
+  developerName: string;
+  messageAt: string;
+  /** @nullable */
+  respondedAt?: string | null;
+  /** @nullable */
+  responseTimeMinutes?: number | null;
+  /** @nullable */
+  topic?: string | null;
+  createdAt: string;
+}
+
+export interface CreateResponseBody {
+  developerId: number;
+  messageAt: string;
+  /** @nullable */
+  respondedAt?: string | null;
+  /** @nullable */
+  topic?: string | null;
+}
+
+export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus];
+
+export const ReportStatus = {
+  submitted: "submitted",
+  missing: "missing",
+} as const;
+
+export interface Report {
+  id: number;
+  developerId: number;
+  developerName: string;
+  date: string;
+  content: string;
+  submittedAt: string;
+  status: ReportStatus;
+  createdAt: string;
+}
+
+export interface CreateReportBody {
+  developerId: number;
+  date?: string;
+  content: string;
+}
+
+export type AlertType = (typeof AlertType)[keyof typeof AlertType];
+
+export const AlertType = {
+  late_checkin: "late_checkin",
+  missing_checkin: "missing_checkin",
+  late_checkout: "late_checkout",
+  missing_checkout: "missing_checkout",
+  missing_report: "missing_report",
+  slow_response: "slow_response",
+} as const;
+
+export interface Alert {
+  id: number;
+  developerId: number;
+  developerName: string;
+  type: AlertType;
+  message: string;
+  resolved: boolean;
+  emailSent: boolean;
+  createdAt: string;
+  /** @nullable */
+  resolvedAt?: string | null;
+}
+
+export type CreateAlertBodyType =
+  (typeof CreateAlertBodyType)[keyof typeof CreateAlertBodyType];
+
+export const CreateAlertBodyType = {
+  late_checkin: "late_checkin",
+  missing_checkin: "missing_checkin",
+  late_checkout: "late_checkout",
+  missing_checkout: "missing_checkout",
+  missing_report: "missing_report",
+  slow_response: "slow_response",
+} as const;
+
+export interface CreateAlertBody {
+  developerId: number;
+  type: CreateAlertBodyType;
+  message: string;
+  emailSent?: boolean;
+}
+
+export interface DashboardSummary {
+  totalDevelopers: number;
+  checkedInToday: number;
+  missingCheckinToday: number;
+  reportsSubmittedToday: number;
+  unresolvedAlerts: number;
+  /** @nullable */
+  avgResponseTimeMinutes?: number | null;
+}
+
+export type DeveloperTodayStatusCheckinStatus =
+  (typeof DeveloperTodayStatusCheckinStatus)[keyof typeof DeveloperTodayStatusCheckinStatus];
+
+export const DeveloperTodayStatusCheckinStatus = {
+  on_time: "on_time",
+  late: "late",
+  missing: "missing",
+} as const;
+
+export type DeveloperTodayStatusCheckoutStatus =
+  (typeof DeveloperTodayStatusCheckoutStatus)[keyof typeof DeveloperTodayStatusCheckoutStatus];
+
+export const DeveloperTodayStatusCheckoutStatus = {
+  on_time: "on_time",
+  early: "early",
+  missing: "missing",
+} as const;
+
+export interface DeveloperTodayStatus {
+  developerId: number;
+  developerName: string;
+  email: string;
+  expectedCheckin: string;
+  expectedCheckout: string;
+  /** @nullable */
+  checkinAt?: string | null;
+  /** @nullable */
+  checkoutAt?: string | null;
+  checkinStatus: DeveloperTodayStatusCheckinStatus;
+  checkoutStatus: DeveloperTodayStatusCheckoutStatus;
+  reportSubmitted: boolean;
+  alertCount: number;
+}
+
+export interface ResponseStat {
+  developerId: number;
+  developerName: string;
+  /** @nullable */
+  avgResponseMinutes?: number | null;
+  totalMessages: number;
+  respondedMessages: number;
+}
+
+export type N8nWebhookBodyData = { [key: string]: unknown };
+
+export interface N8nWebhookBody {
+  event: string;
+  /** @nullable */
+  developerId?: number | null;
+  data?: N8nWebhookBodyData;
+}
+
+export interface N8nWebhookResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface TriggerCheckResponse {
+  success: boolean;
+  alertsCreated: number;
+  message: string;
+}
+
+export type ListCheckinsParams = {
+  /**
+   * @nullable
+   */
+  developerId?: number | null;
+  /**
+   * @nullable
+   */
+  date?: string | null;
+};
+
+export type ListResponsesParams = {
+  /**
+   * @nullable
+   */
+  developerId?: number | null;
+  /**
+   * @nullable
+   */
+  date?: string | null;
+};
+
+export type ListReportsParams = {
+  /**
+   * @nullable
+   */
+  developerId?: number | null;
+  /**
+   * @nullable
+   */
+  date?: string | null;
+};
+
+export type ListAlertsParams = {
+  /**
+   * @nullable
+   */
+  developerId?: number | null;
+  /**
+   * @nullable
+   */
+  resolved?: string | null;
+};
