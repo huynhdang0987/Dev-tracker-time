@@ -7,6 +7,7 @@ import {
   TriggerDailyCheckResponse,
 } from "@workspace/api-zod";
 import { logger } from "../lib/logger";
+import { getTodayVN, getDateStringVN, getVNMinutes, nowInVN } from "../lib/tz";
 
 async function getSettingValue(key: string): Promise<string | null> {
   const [row] = await db.select().from(settingsTable).where(eq(settingsTable.key, key));
@@ -41,10 +42,9 @@ router.post("/n8n/webhook", async (req, res): Promise<void> => {
 router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
   req.log.info("Triggering daily compliance check");
 
-  const today = new Date().toISOString().split("T")[0];
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
+  const today = getTodayVN();
+  const now = nowInVN();
+  const currentMinutes = getVNMinutes(new Date());
 
   const devs = await db.select().from(developersTable).where(eq(developersTable.active, true));
   const checkins = await db.select().from(checkinsTable).where(eq(checkinsTable.date, today));
@@ -59,7 +59,6 @@ router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
     const [checkinH, checkinM] = dev.checkinTime.split(":").map(Number);
     const [checkoutH, checkoutM] = dev.checkoutTime.split(":").map(Number);
 
-    const totalCurrentMin = currentHour * 60 + currentMinute;
     const expectedCheckinMin = checkinH * 60 + checkinM;
     const expectedCheckoutMin = checkoutH * 60 + checkoutM;
 
@@ -69,10 +68,10 @@ router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
       .where(eq(alertsTable.developerId, dev.id));
 
     const todayAlerts = existingAlerts.filter(
-      (a) => a.createdAt.toISOString().startsWith(today)
+      (a) => getDateStringVN(a.createdAt) === today
     );
 
-    if (!checkin && totalCurrentMin > expectedCheckinMin + 30) {
+    if (!checkin && currentMinutes > expectedCheckinMin + 30) {
       const alreadyExists = todayAlerts.some((a) => a.type === "missing_checkin");
       if (!alreadyExists) {
         const [alert] = await db
@@ -107,7 +106,7 @@ router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
       }
     }
 
-    if (!hasReport && totalCurrentMin > expectedCheckoutMin) {
+    if (!hasReport && currentMinutes > expectedCheckoutMin) {
       const alreadyExists = todayAlerts.some((a) => a.type === "missing_report");
       if (!alreadyExists) {
         const [alert] = await db
@@ -125,7 +124,7 @@ router.post("/n8n/trigger-check", async (req, res): Promise<void> => {
       }
     }
 
-    if (checkin && !checkin.checkoutAt && totalCurrentMin > expectedCheckoutMin + 60) {
+    if (checkin && !checkin.checkoutAt && currentMinutes > expectedCheckoutMin + 60) {
       const alreadyExists = todayAlerts.some((a) => a.type === "missing_checkout");
       if (!alreadyExists) {
         const [alert] = await db

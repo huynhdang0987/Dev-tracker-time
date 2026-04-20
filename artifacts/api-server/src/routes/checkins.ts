@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db, checkinsTable, developersTable } from "@workspace/db";
 import {
   CreateCheckinBody,
@@ -9,22 +9,19 @@ import {
   ListCheckinsResponse,
   CheckoutResponse,
 } from "@workspace/api-zod";
+import { getDateStringVN, parseExpectedTimeAsUTC } from "../lib/tz";
 
 const router: IRouter = Router();
 
 function getCheckinStatus(checkinAt: Date, expectedTime: string): string {
-  const [h, m] = expectedTime.split(":").map(Number);
-  const expected = new Date(checkinAt);
-  expected.setHours(h, m, 0, 0);
+  const expected = parseExpectedTimeAsUTC(checkinAt, expectedTime);
   const diffMin = (checkinAt.getTime() - expected.getTime()) / 60000;
   if (diffMin <= 5) return "on_time";
   return "late";
 }
 
 function getCheckoutStatus(checkoutAt: Date, expectedTime: string): string {
-  const [h, m] = expectedTime.split(":").map(Number);
-  const expected = new Date(checkoutAt);
-  expected.setHours(h, m, 0, 0);
+  const expected = parseExpectedTimeAsUTC(checkoutAt, expectedTime);
   const diffMin = (checkoutAt.getTime() - expected.getTime()) / 60000;
   if (diffMin >= -5) return "on_time";
   return "early";
@@ -81,7 +78,7 @@ router.post("/checkins", async (req, res): Promise<void> => {
   }
 
   const checkinAt = new Date(parsed.data.checkinAt);
-  const date = checkinAt.toISOString().split("T")[0];
+  const date = getDateStringVN(checkinAt);
   const checkinStatus = getCheckinStatus(checkinAt, dev.checkinTime);
 
   const [checkin] = await db

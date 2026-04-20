@@ -6,11 +6,12 @@ import {
   GetTodayStatusResponse,
   GetResponseStatsResponse,
 } from "@workspace/api-zod";
+import { getTodayVN } from "../lib/tz";
 
 const router: IRouter = Router();
 
 router.get("/dashboard/summary", async (_req, res): Promise<void> => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayVN();
 
   const [devsResult] = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -59,7 +60,7 @@ router.get("/dashboard/summary", async (_req, res): Promise<void> => {
 });
 
 router.get("/dashboard/today", async (_req, res): Promise<void> => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayVN();
 
   const devs = await db.select().from(developersTable).where(eq(developersTable.active, true));
   const checkins = await db.select().from(checkinsTable).where(eq(checkinsTable.date, today));
