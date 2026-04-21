@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Plus } from "lucide-react";
+import { toLocalDatetimeString, formatLocalTime } from "@/lib/time";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -57,7 +58,7 @@ export default function Checkins() {
     resolver: zodResolver(logCheckinSchema),
     defaultValues: {
       developerId: 0,
-      checkinAt: new Date().toISOString().slice(0, 16),
+      checkinAt: toLocalDatetimeString(new Date()),
       notes: ""
     }
   });
@@ -65,7 +66,7 @@ export default function Checkins() {
   const checkoutForm = useForm<LogCheckoutValues>({
     resolver: zodResolver(logCheckoutSchema),
     defaultValues: {
-      checkoutAt: new Date().toISOString().slice(0, 16)
+      checkoutAt: toLocalDatetimeString(new Date())
     }
   });
 
@@ -239,11 +240,11 @@ export default function Checkins() {
                   <TableCell>{record.date}</TableCell>
                   <TableCell className="font-medium">{record.developerName}</TableCell>
                   <TableCell>
-                    {record.checkinAt ? format(new Date(record.checkinAt), "HH:mm") : "-"}
+                    {record.checkinAt ? formatLocalTime(record.checkinAt) : "-"}
                   </TableCell>
                   <TableCell>{getStatusBadge(record.checkinStatus)}</TableCell>
                   <TableCell>
-                    {record.checkoutAt ? format(new Date(record.checkoutAt), "HH:mm") : "-"}
+                    {record.checkoutAt ? formatLocalTime(record.checkoutAt) : "-"}
                   </TableCell>
                   <TableCell>{getStatusBadge(record.checkoutStatus)}</TableCell>
                   <TableCell className="text-right">

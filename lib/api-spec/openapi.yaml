@@ -546,7 +546,6 @@ components:
           type: string
         date:
           type: string
-          format: date
         checkinAt:
           type: ["string", "null"]
           format: date-time
@@ -653,7 +652,6 @@ components:
           type: string
         date:
           type: string
-          format: date
         content:
           type: string
         submittedAt:
@@ -682,7 +680,6 @@ components:
           type: integer
         date:
           type: string
-          format: date
         content:
           type: string
       required:

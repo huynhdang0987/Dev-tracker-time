@@ -3,6 +3,7 @@ import { useListReports, getListReportsQueryKey, useListDevelopers, getListDevel
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { formatLocalTime } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, FileText, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -186,7 +187,7 @@ export default function Reports() {
                 {report.status === 'submitted' && report.submittedAt && (
                   <div className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border flex items-center gap-1">
                     <FileText className="w-3 h-3" />
-                    Submitted at {format(new Date(report.submittedAt), "HH:mm")}
+                    Submitted at {formatLocalTime(report.submittedAt)}
                   </div>
                 )}
               </CardContent>

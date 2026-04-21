@@ -111,7 +111,7 @@ export const ListCheckinsResponseItem = zod.object({
   id: zod.number(),
   developerId: zod.number(),
   developerName: zod.string(),
-  date: zod.coerce.date(),
+  date: zod.string(),
   checkinAt: zod.coerce.date().nullish(),
   checkoutAt: zod.coerce.date().nullish(),
   checkinStatus: zod.enum(["on_time", "late", "missing"]),
@@ -145,7 +145,7 @@ export const CheckoutResponse = zod.object({
   id: zod.number(),
   developerId: zod.number(),
   developerName: zod.string(),
-  date: zod.coerce.date(),
+  date: zod.string(),
   checkinAt: zod.coerce.date().nullish(),
   checkoutAt: zod.coerce.date().nullish(),
   checkinStatus: zod.enum(["on_time", "late", "missing"]),
@@ -196,7 +196,7 @@ export const ListReportsResponseItem = zod.object({
   id: zod.number(),
   developerId: zod.number(),
   developerName: zod.string(),
-  date: zod.coerce.date(),
+  date: zod.string(),
   content: zod.string(),
   submittedAt: zod.coerce.date(),
   status: zod.enum(["submitted", "missing"]),
@@ -209,7 +209,7 @@ export const ListReportsResponse = zod.array(ListReportsResponseItem);
  */
 export const CreateReportBody = zod.object({
   developerId: zod.number(),
-  date: zod.coerce.date().optional(),
+  date: zod.string().optional(),
   content: zod.string(),
 });
 

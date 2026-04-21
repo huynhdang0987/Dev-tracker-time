@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useListResponses, getListResponsesQueryKey, useGetResponseStats, getGetResponseStatsQueryKey, useCreateResponse, useListDevelopers, getListDevelopersQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { toLocalDatetimeString, formatLocalTime } from "@/lib/time";
 import { Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -48,7 +48,7 @@ export default function Responses() {
     resolver: zodResolver(logResponseSchema),
     defaultValues: {
       developerId: 0,
-      messageAt: new Date().toISOString().slice(0, 16),
+      messageAt: toLocalDatetimeString(new Date()),
       respondedAt: "",
       topic: ""
     }
@@ -217,9 +217,9 @@ export default function Responses() {
                 <TableRow key={msg.id}>
                   <TableCell className="font-medium">{msg.developerName}</TableCell>
                   <TableCell>{msg.topic || '-'}</TableCell>
-                  <TableCell>{format(new Date(msg.messageAt), "MMM d, HH:mm")}</TableCell>
+                  <TableCell>{formatLocalTime(msg.messageAt, "MMM d, HH:mm")}</TableCell>
                   <TableCell>
-                    {msg.respondedAt ? format(new Date(msg.respondedAt), "MMM d, HH:mm") : "-"}
+                    {msg.respondedAt ? formatLocalTime(msg.respondedAt, "MMM d, HH:mm") : "-"}
                   </TableCell>
                   <TableCell className="text-right font-mono">
                     {msg.responseTimeMinutes !== null && msg.responseTimeMinutes !== undefined
